@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>С Днем святого Валентина, Дикий!</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #ffe6f2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
+            color: #e91e63;
+            text-align: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        h1 {
+            font-size: 3em;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.5em;
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>С Днем Святого Валентина,<br>Дикий!</h1>
+    <p>Пусть этот день принесет тебе море любви,<br>океан тепла и целую гору пива!</p>
+    <canvas id="heartCanvas"></canvas>
+    <audio id="bgm" loop>
+        <source src="your_music.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио элемент.
+    </audio>
+
+    <script>
+        const canvas = document.getElementById("heartCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const hearts = [];
+
+        function createHeart() {
+            const heart = {
+                x: Math.random() * canvas.width,
+                y: -20,
+                size: Math.random() * 20 + 10,
+                speed: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.5,
+                color: `rgba(255, ${Math.random() * 150 + 50}, ${Math.random() * 150 + 50}, ${Math.random() * 0.8 + 0.2})`,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.02,
+                // Добавим эффект мерцания, изменяя opacity со временем
+                opacityChangeSpeed: (Math.random() - 0.5) * 0.02, // Скорость изменения прозрачности
+            };
+            hearts.push(heart);
+        }
+
+        function drawHeart(heart) {
+            ctx.save();
+            ctx.translate(heart.x + heart.size / 2, heart.y + heart.size / 2);
+            ctx.rotate(heart.rotation);
+                        ctx.translate(-heart.x - heart.size / 2, -heart.y - heart.size / 2);
+
+            ctx.fillStyle = heart.color;
+            ctx.globalAlpha = heart.opacity;
+            ctx.beginPath();
+            ctx.moveTo(heart.x, heart.y + heart.size / 4);
+            ctx.bezierCurveTo(
+                heart.x, heart.y - heart.size / 4,
+                heart.x + heart.size / 2, heart.y - heart.size / 4,
+                heart.x + heart.size / 2, heart.y + heart.size / 4
+            );
+            ctx.bezierCurveTo(
+                heart.x + heart.size / 2, heart.y + heart.size / 2,
+                heart.x, heart.y + heart.size * 3 / 4,
+                heart.x - heart.size / 2, heart.y + heart.size / 2
+            );
+            ctx.bezierCurveTo(
+                heart.x - heart.size / 2, heart.y - heart.size / 4,
+                heart.x, heart.y - heart.size / 4,
+                heart.x, heart.y + heart.size / 4
+            );
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            ctx.restore();
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (Math.random() < 0.1) {
+                createHeart();
+            }
+
+            for (let i = 0; i < hearts.length; i++) {
+                hearts[i].y += hearts[i].speed;
+                hearts[i].rotation += hearts[i].rotationSpeed;
+
+                // Изменяем прозрачность
+                hearts[i].opacity += hearts[i].opacityChangeSpeed;
+                // Ограничиваем прозрачность, чтобы не выходила за пределы 0 и 1
+                if (hearts[i].opacity > 1 || hearts[i].opacity < 0.2) {
+                    hearts[i].opacityChangeSpeed = -hearts[i].opacityChangeSpeed; // Меняем направление изменения
+                }
+
+
+                if (hearts[i].y > canvas.height) {
+                    hearts.splice(i, 1);
+                    i--;
+                } else {
+                    drawHeart(hearts[i]);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Включаем музыку при взаимодействии пользователя
+        document.addEventListener('click', function() {
+            const bgm = document.getElementById('bgm');
+            bgm.play();
+        });
+
+        document.addEventListener('touchstart', function() {
+            const bgm = document.getElementById('bgm');
+            bgm.play();
+        });
+    </script>
+</body>
+</html>
+
